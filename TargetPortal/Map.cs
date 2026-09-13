@@ -214,8 +214,8 @@ public static class Map
 		}
 	}
 
-	[HarmonyPatch(typeof(Minimap), nameof(Minimap.RemovePinUnderPointer))]
-	private class MapRightClick
+	[HarmonyPatch(typeof(Minimap), nameof(Minimap.OnMapMiddleClick))]
+	private class MapMiddleClickFavorite
 	{
 		private static void Prefix()
 		{

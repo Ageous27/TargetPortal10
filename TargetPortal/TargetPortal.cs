@@ -8,7 +8,6 @@ using BepInEx;
 using BepInEx.Configuration;
 using Groups;
 using HarmonyLib;
-using JetBrains.Annotations;
 using ServerSync;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ namespace TargetPortal;
 public class TargetPortal : BaseUnityPlugin
 {
 	private const string ModName = "TargetPortal";
-	private const string ModVersion = "1.2.6";
+	private const string ModVersion = "1.3.0";
 	private const string ModGUID = "org.bepinex.plugins.targetportal";
 
 	public static HashSet<ZDO> knownPortals = new();
@@ -147,8 +146,8 @@ public class TargetPortal : BaseUnityPlugin
 	{
 		while (true)
 		{
-			Dictionary<ZoneSystem.SectorIndex, List<ZDO>> portalList = ZDOMan.instance.GetPortals();
-			HashSet<ZDO> foundPortals = limitToVanillaPortals.Value == Toggle.On ? new HashSet<ZDO>(portalList.SelectMany(l => l.Value).Where(z => vanillaPortalPrefabs.Contains(z.m_prefab))) : new HashSet<ZDO>(portalList.SelectMany(l => l.Value));
+			List<ZDO> portalList = ZDOMan.instance.GetPortalList();
+			HashSet<ZDO> foundPortals = limitToVanillaPortals.Value == Toggle.On ? new HashSet<ZDO>(portalList.Where(z => vanillaPortalPrefabs.Contains(z.m_prefab))) : new HashSet<ZDO>(portalList);
 
 			if (ZNet.instance.IsServer())
 			{
@@ -168,7 +167,7 @@ public class TargetPortal : BaseUnityPlugin
 	[HarmonyPatch(typeof(Game), nameof(Game.ConnectPortals))]
 	private static class SkipPortalConnecting
 	{
-		private static readonly MethodInfo PortalGetter = AccessTools.DeclaredMethod(typeof(ZDOMan), nameof(ZDOMan.GetPortals));
+		private static readonly MethodInfo PortalGetter = AccessTools.DeclaredMethod(typeof(ZDOMan), nameof(ZDOMan.GetPortalList));
 
 		private static List<ZDO> FilterPortals(List<ZDO> portals)
 		{
@@ -194,9 +193,8 @@ public class TargetPortal : BaseUnityPlugin
 	}
 
 	[HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.AddPeer))]
-	public static class SendKnownPortalsOnConnect
+		public static class SendKnownPortalsOnConnect
 	{
-		[UsedImplicitly]
 		private static void Postfix(ZDOMan __instance, ZNetPeer netPeer)
 		{
 			if (ZNet.instance.IsServer())
@@ -352,7 +350,7 @@ public class TargetPortal : BaseUnityPlugin
 		{
 			if (maximumNumberOfPortals.Value > 0 && knownPortals.Count >= maximumNumberOfPortals.Value)
 			{
-				__instance.Message(MessageHud.MessageType.Center, $"You cannot place more than {maximumNumberOfPortals.Value} portals in this world.");
+				__instance.Message(MessageHud.MessageType.Center, $"You cannot place more than {maximumNumberOfPortals.Value} portals in this world.", 0, null, false);
 				return false;
 			}
 			return true;

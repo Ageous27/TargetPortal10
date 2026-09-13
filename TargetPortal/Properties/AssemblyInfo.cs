@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("TargetPortal")]
-[assembly: AssemblyDescription("https://valheim.thunderstore.io/package/Smoothbrain/TargetPortal")]
+[assembly: AssemblyDescription("https://github.com/Ageous27/TargetPortal10")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TargetPortal")]
